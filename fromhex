@@ -1,0 +1,17 @@
+#!/bin/bash
+
+value=""
+# Check if file descriptor 0 is opened
+if test ! -t 0; then
+    read line
+    value=$line
+elif [[ -n "$1" ]]; then
+    value=$1
+else
+    echo 'Hex number required!'
+    exit 1
+fi
+
+value=$(echo "$value" | sed 's/0x//g')
+
+echo "obase=10; ibase=16; ${value^^}" | bc
