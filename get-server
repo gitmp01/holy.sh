@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#
+# Author:  gitmp01
+# version: 1.0.0
+#
+# Description: Reads the .ssh/config files aliases
+# and show you the matching servers.
+#
+
+cat "$HOME/.ssh/config" \
+  | grep -A 4 -i "$1" \
+  | grep -iE '(host|user|hostname)' \
+  | sed 'N;N;s/\n//g' \
+  | awk '{printf "%-30s %s@%s\n", $2, $4, $6}' \
+  | sort -u
