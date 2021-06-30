@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# 
+# Author: gitmp01
+# Version: 1.0.0
+# 
+# Description: convert an hex string to the correspoding
+# integer value
+#
 value=""
 # Check if file descriptor 0 is opened
 if test ! -t 0; then
