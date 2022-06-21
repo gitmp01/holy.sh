@@ -23,9 +23,9 @@ usage() {
 }
 
 main() {
-  local range=$1
+  local range=${1:-null}
 
-  if [[ "$range" == '-h' || "$range" == '--help' ]]; then
+  if [[ "$range" == '-h' || "$range" == '--help' || "$range" == 'null' ]]; then
     usage
     exit 0
   fi
@@ -40,11 +40,9 @@ main() {
   lower=$(tr -d '\n;' <<< "$lower")
   lower=${lower:-0}
 
-  if [[ ( "$lower" < "$upper" ) ]]; then
-    for (( i = lower; i < upper; i++ )); do
-      echo "$i"
-    done
-  fi
+  for (( i = lower; i < upper; i++ )); do
+    echo "$i"
+  done
 
   exit 0
 }
