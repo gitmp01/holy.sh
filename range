@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -euo 'pipefail'
+
+usage() {
+  local b=$(tput bold)
+  local n=$(tput sgr0)
+
+  echo "${b}Usage:${n} $(basename "$0") '[<lower>;]<upper>'"
+  echo ""
+  echo "${b}Description:${n}"
+  echo "  Generates enumerated newlines from <lower> to <upper>"
+  echo ""
+  echo "${b}Arguments:${n}"
+  echo ""
+  echo "  <lower>     lower bound (integer), default to 0 if omitted"
+  echo "  <upper>     upper bound (integer), mandatory"
+  echo ""
+  echo "${b}Examples:${n}"
+  echo ""
+  echo "  $(basename "$0") '10;20'"
+  echo "  $(basename "$0") '300'"
+}
+
+main() {
+  local range=$1
+
+  if [[ "$range" == '-h' || "$range" == '--help' ]]; then
+    usage
+    exit 0
+  fi
+  if ! grep -E '([0-9]+;[0-9]+|^[0-9]+)' <<< "$range" > /dev/null; then
+    >&2 echo "Error: invalid range!"
+    usage
+    exit 1
+  fi
+  local lower=$(grep -Eo '[0-9]+;' <<< "$range" | tr -d '\n')
+  local upper=$(sed "s/${lower:-;}//g" <<< "$range" | tr -d '\n')
+
+  lower=$(tr -d '\n;' <<< "$lower")
+  lower=${lower:-0}
+
+  if [[ ( "$lower" < "$upper" ) ]]; then
+    for (( i = lower; i < upper; i++ )); do
+      echo "$i"
+    done
+  fi
+
+  exit 0
+}
+
+main "$@"
