@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Author: gitmp01
+# Version: 1.0.0
+#
+# Description: ring a bell when a match
+# is found
+#
+
+function check_paplay_exists() {
+    if [[ -z $(which paplay) ]]; then
+        >&2 echo 'paplay command not found: is pulseaudio installed?'
+        >&2 echo 'Install it through: '
+        >&2 echo 'sudo apt get install -y pulseaudio'
+        exit 1
+    fi
+}
+
+function check_bell_variable() {
+    if [[ -z "$BELL" ]]; then
+        >&2 echo 'BELL env variable not set, set it to a sound you want to play'
+        >&2 echo 'Like'
+        >&2 echo 'export BELL=/usr/share/sounds/freedesktop/stereo/complete.oga'
+        exit 1
+    fi
+}
+
+function find_match() {
+    local text=$1
+    local regexp=$2
+    
+    local output=$(echo "$text" | grep -E "$regexp")
+
+    if [[ -n "$output" ]]; then
+        paplay "$BELL"
+        echo "$output"
+    fi
+}
+
+function usage() {
+  local b=$(tput bold)
+  local n=$(tput sgr0)
+ 
+  echo "${b}Usage:${n} $(basename "$0") <regexp> [text]"
+  echo ""
+  echo "${b}Description:${n}"
+  echo "   Use this script to warn you when something is printed" 
+  echo "   in a log file." 
+  echo ""
+  echo "${b}Arguments:${n}"
+  echo ""
+  echo "  <regexp>    'grep -E' compatible regexp "
+  echo "  text        optional text for testing the script"
+  echo ""
+  echo "${b}Note:${n}"
+  echo "  You should set the BELL env variable to a sound like:"
+  echo "    export BELL=/path/to/sound.oga"
+  echo ""
+  echo "  You may consider to add the line above to your .bashrc file."
+  echo ""
+  echo "${b}Examples:${n}"
+  echo ""
+  echo "  tail -f afile.log | $(basename "$0") 'Error: ¯\_(ツ)_/¯' "
+  echo "  $(basename "$0") 'Hello' 'Hello World!'"
+}
+
+function show_usage_if_null() {
+  local value=$1
+
+  if [[ "$value" == "null" ]]; then
+    usage
+    exit 1
+  fi
+}
+
+function main() {
+
+    check_paplay_exists
+    check_bell_variable
+
+    local regex=${1:-null}
+    local value=${2:-null}
+
+    show_usage_if_null "$regex"
+
+    # Check if file descriptor 0 is opened
+    if test ! -t 0; then
+      while read value; do
+        find_match "$value" "$regex"
+      done
+    elif [[ -n "$1" ]]; then
+        show_usage_if_null "$value"
+        find_match "$value" "$regex"
+        exit 0
+    else
+      usage
+      exit 1
+    fi
+}
+
+main "$@"
