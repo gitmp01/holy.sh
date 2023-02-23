@@ -20,5 +20,6 @@ else
 fi
 
 value=$(echo "$value" | sed 's/0x//g')
+value=$(echo "$value" | sed 's/"//g')
 
 echo "obase=10; ibase=16; ${value^^}" | bc
