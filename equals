@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#
+# Author: gitmp01
+# Version: 1.0.0
+#
+# Description: check if the stdin string is
+# equal to the given string as argument
+#
+stdin=""
+# Check if file descriptor 0 is opened
+if test ! -t 0; then
+    read line
+    stdin=$line
+fi
+
+if [[ -n "$1" ]]; then
+    value=$1
+fi
+
+if [[ "$stdin" == "$value" ]]; then
+  echo 'true'
+else
+  echo 'false'
+fi
+
+exit 0
