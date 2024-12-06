@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -euo 'pipefail'
+
+usage() {
+    echo "Copy a file to <dest> and setup a link to the file just copied"
+    echo "with the same name"
+    echo "rln <source> <dest>"
+}
+
+
+main() {
+    local source=$1
+    local dest=$2
+    local fle=$(basename $1)
+    local dir=$(dir $2)
+
+    if [ -z $source ] || [ -z $dest ]; then
+        usage
+        exit 1
+    fi
+
+    echo "source: $1"
+    echo "dest: $2"
+    echo $dir
+
+    cp $1 $2
+    rm $1
+    ln -s "$dir"
+
+    exit 0
+}
+
+main "$@"
